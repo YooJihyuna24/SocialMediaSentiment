@@ -2,3 +2,4 @@ streamlit
 dotenv
 transformers
 praw
+plotly
