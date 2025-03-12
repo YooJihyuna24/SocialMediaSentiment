@@ -2,6 +2,8 @@ from typing import List
 from praw import Reddit
 from praw.models import Submission
 
+import settings
+
 
 def initialize_reddit_api(client_id: str, client_secret: str) -> Reddit:
     connection = Reddit(
@@ -13,7 +15,7 @@ def initialize_reddit_api(client_id: str, client_secret: str) -> Reddit:
 
 
 def get_hot_submissions_title_and_text(
-    connection: Reddit, subreddit: str, count: int
+    connection: Reddit, subreddit: str, count: int = settings.SUBMISSION_COUNT
 ) -> List[Submission]:
     return [
         submission.title + submission.selftext

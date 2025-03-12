@@ -6,7 +6,6 @@ import plotly.express as px
 
 from reddit import get_hot_submissions_title_and_text, initialize_reddit_api
 from sentiment_analyzer import initialize_analyzer, analyze_sentiment
-import settings
 
 # initialization
 with st.spinner(
@@ -28,7 +27,7 @@ subreddit = st.text_input("Subreddit", "MachineLearning")
 
 with st.spinner("Fetching submissions from the reddit api..."):
     submissions = get_hot_submissions_title_and_text(
-        reddit_connection, subreddit=subreddit, count=settings.SUBMISSION_COUNT
+        reddit_connection, subreddit=subreddit
     )
     data = pd.DataFrame({"text": submissions})
 
