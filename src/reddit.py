@@ -1,4 +1,4 @@
-from typing import Iterator
+from typing import List
 from praw import Reddit
 from praw.models import Submission
 
@@ -12,7 +12,10 @@ def initialize_reddit_api(client_id: str, client_secret: str) -> Reddit:
     return connection
 
 
-def get_hot_submissions(
+def get_hot_submissions_title_and_text(
     connection: Reddit, subreddit: str, count: int
-) -> Iterator[Submission]:
-    return connection.subreddit(subreddit).hot(limit=count)
+) -> List[Submission]:
+    return [
+        submission.title + submission.selftext
+        for submission in connection.subreddit(subreddit).hot(limit=count)
+    ]
