@@ -1,5 +1,6 @@
 streamlit
 dotenv
 transformers
+tf-keras
 praw
 plotly
