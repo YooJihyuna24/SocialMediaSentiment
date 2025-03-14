@@ -4,3 +4,4 @@ transformers
 tf-keras
 praw
 plotly
+matplotlib
