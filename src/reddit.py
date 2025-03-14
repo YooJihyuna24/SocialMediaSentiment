@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Literal
 from praw import Reddit
 from praw.models import Submission
 
@@ -14,10 +14,22 @@ def initialize_reddit_api(client_id: str, client_secret: str) -> Reddit:
     return connection
 
 
-def get_hot_submissions_title_and_text(
-    connection: Reddit, subreddit: str, count: int = settings.SUBMISSION_COUNT
+def get_submissions_text(
+    connection: Reddit,
+    subreddit: str,
+    type: Literal["hot", "top", "new", "rising"],
+    count: int = settings.SUBMISSION_COUNT,
 ) -> List[Submission]:
+    match type:
+        case "hot":
+            submissions = connection.subreddit(subreddit).hot(limit=count)
+        case "new":
+            submissions = connection.subreddit(subreddit).new(limit=count)
+        case "top":
+            submissions = connection.subreddit(subreddit).top(limit=count)
+        case "rising":
+            submissions = connection.subreddit(subreddit).rising(limit=count)
     return [
         submission.title + submission.selftext
-        for submission in connection.subreddit(subreddit).hot(limit=count)
+        for submission in submissions
     ]
