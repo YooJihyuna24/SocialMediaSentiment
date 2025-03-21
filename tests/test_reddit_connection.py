@@ -1,6 +1,6 @@
 import os
 import dotenv
-from reddit import get_submissions_text, initialize_reddit_api, get_subreddit_user_count
+from reddit import get_submissions_text, initialize_reddit_api, get_subreddit_user_count, get_top_submission
 
 
 def test_submission_returns():
@@ -27,3 +27,15 @@ def test_get_subscriber_count():
     result = get_subreddit_user_count(reddit_connection, "wallstreetbets")
     assert result is not None
     assert isinstance(result, int)
+
+
+def test_get_top_submission():
+     # setup api authentication
+    dotenv.load_dotenv()
+    CLIENT_ID = os.environ.get("CLIENT_ID")
+    CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
+    reddit_connection = initialize_reddit_api(CLIENT_ID, CLIENT_SECRET)
+
+    result = get_top_submission(reddit_connection, "wallstreetbets")
+    assert result is not None
+    assert isinstance(result, str)

@@ -37,3 +37,10 @@ def get_subreddit_user_count(
     subreddit: str,
 ) -> int:
     return connection.subreddit(subreddit).subscribers
+
+def get_top_submission(
+    connection: Reddit,
+    subreddit: str,    
+) -> str:
+    return  "reddit.com" + next(connection.subreddit(subreddit).top(limit=1,time_filter="week")).permalink
+
