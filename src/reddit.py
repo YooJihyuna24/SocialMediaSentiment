@@ -42,7 +42,7 @@ def get_submissions_text(
             submissions = connection.subreddit(subreddit).top(limit=count)
         case "rising":
             submissions = connection.subreddit(subreddit).rising(limit=count)
-    return [submission.title + submission.selftext for submission in submissions]
+    return [submission.title + "\n" + submission.selftext for submission in submissions]
 
 
 def get_subreddit_user_count(
