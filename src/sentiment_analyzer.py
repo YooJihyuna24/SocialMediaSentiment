@@ -1,6 +1,6 @@
 import re
 from transformers import (
-    TFAutoModelForSequenceClassification,
+    AutoModelForSequenceClassification,
     AutoTokenizer,
     TextClassificationPipeline,
 )
@@ -8,11 +8,16 @@ from transformers import (
 import settings
 
 
-def initialize_analyzer() -> TextClassificationPipeline:
-    model_name = settings.TEXT_CLASSIFICATION_MODEL
-
+def create_sentiment_pipeline(
+    model_name: str = settings.TEXT_CLASSIFICATION_MODEL,
+) -> TextClassificationPipeline:
+    """
+    Retrieves a text classification model from hugging face and returns a pipeline
+    :param model_name: Text classification model string name
+    :return: Transformers pipeline
+    """
     tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = TFAutoModelForSequenceClassification.from_pretrained(model_name)
+    model = AutoModelForSequenceClassification.from_pretrained(model_name)
 
     return TextClassificationPipeline(
         task="text-classification",
@@ -40,5 +45,14 @@ def clean_up_text(text: str) -> str:
     return text
 
 
-def analyze_sentiment(analyzer: TextClassificationPipeline, text: str) -> str:
-    return analyzer(text)[0]["label"]
+def analyze_sentiment(pipeline: TextClassificationPipeline, text: str) -> str:
+    """
+    Analyzes sentiment of the given text using the pipeline
+    :param text: Input string
+    :return: Sentiment label
+    """
+    try:
+        result = list(pipeline(text))
+        return result[0]["label"]
+    except Exception as e:
+        return f"ERROR: {str(e)}"
