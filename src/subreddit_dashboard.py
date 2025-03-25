@@ -4,73 +4,75 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import plotly.express as px
 from wordcloud import WordCloud
-
-import mock_data
-
-
-def create_wordcloud(text_data: str) -> Figure:
-    wordcloud = WordCloud(width=400, height=400, background_color="white").generate(
-        text_data
-    )
-    fig, ax = plt.subplots(figsize=(4, 4))
-    ax.imshow(wordcloud, interpolation="bilinear")
-    ax.axis("off")
-    st.markdown("<div style='margin-top: 25px;'></div>", unsafe_allow_html=True)
-    st.markdown(
-        '<h3 style="font-size:16px; font-family: Source Sans Pro;"><b>☁️ Wordcloud</b></h3>',
-        unsafe_allow_html=True,
-    )
-
-    return fig
+import data_processor
 
 
-def create_line_chart(sentiment_over_time: Dict):
-    fig = px.line(
-        x=sentiment_over_time["dates"],
-        y=sentiment_over_time["sentiment"],
-        title="📈 Sentiment über Zeit",
-        labels={"x": "Datum", "y": "Sentiment"},
-        width=400,
-        height=400,
-    )
-    return fig
+# DataProcessor erstellen
+processor = data_processor.DataProcessor()
+
+dashboard_data = processor.fetch_and_process_data("wallstreetbets")
 
 
-def create_pie_chart(sentiment_count: Dict):
-    fig = px.pie(
-        names=sentiment_count.keys(),
-        values=sentiment_count.values(),
-        title="🥧 Sentiment-Verteilung",
-        width=400,
-        height=400,
-    )
-    return fig
+class SubredditDashboard:
+    def __init__(self, subreddit: str):
+        self.subreddit = subreddit
+
+    @staticmethod
+    def create_wordcloud(text_data: str) -> Figure:
+        wordcloud = WordCloud(width=400, height=400, background_color="white").generate(text_data)
+        fig, ax = plt.subplots(figsize=(4, 4))
+        ax.imshow(wordcloud, interpolation="bilinear")
+        ax.axis("off")
+        return fig
+
+    @staticmethod
+    def create_line_chart(sentiment_over_time: Dict) -> Figure:
+        fig = px.line(
+            x=sentiment_over_time["dates"],
+            y=sentiment_over_time["sentiment"],
+            title="📈 Sentiment über Zeit",
+            labels={"x": "Datum", "y": "Sentiment"},
+            width=400,
+            height=400,
+        )
+        return fig
+
+    @staticmethod
+    def create_pie_chart(sentiment_count: Dict) -> Figure:
+        fig = px.pie(
+            names=sentiment_count.keys(),
+            values=sentiment_count.values(),
+            title="🥧 Sentiment-Verteilung",
+            width=400,
+            height=400,
+        )
+        return fig
 
 
-st.markdown(
-    "<h1 style='text-align: center;'>📊 Subreddit Dashboard</h1>",
-    unsafe_allow_html=True,
-)
+# Streamlit UI
+st.markdown("<h1 style='text-align: center;'>📊 Subreddit Dashboard</h1>", unsafe_allow_html=True)
 
-subreddit = st.text_input("Subreddit auswählen", mock_data.subreddit_name)
+subreddit_name = st.text_input("Subreddit auswählen", "wallstreetbets")
 
-st.markdown('<div class="kpi-container">', unsafe_allow_html=True)
+if st.button("📊 Daten abrufen"):
+    # Daten abrufen
+    submissions = processor.fetch_and_process_data(subreddit_name)
+    sentiment_results = processor.analyze_sentiment(submissions)
+    kpis = processor.aggregate_kpis(submissions, sentiment_results)
+    dashboard_data = processor.prepare_dashboard_data(submissions, sentiment_results)
 
-col1, col2, col3 = st.columns(3)
+    st.markdown('<div class="kpi-container">', unsafe_allow_html=True)
 
-with col1:
-    st.metric(label="👥 Anzahl der Mitglieder", value="120K")
-    st.pyplot(create_wordcloud(mock_data.text_data))
+    col1, col2, col3 = st.columns(3)
 
-with col2:
-    st.metric(label="🔥 Aktive Nutzer", value="5.2K")
-    st.plotly_chart(
-        create_line_chart(mock_data.sentiment_over_time), use_container_width=True
-    )
+    with col1:
+        st.metric(label="👥 Anzahl der Beiträge", value=kpis["total_posts"])
+        st.pyplot(SubredditDashboard.create_wordcloud(" ".join(submissions)), use_container_width=True)
 
-with col3:
-    st.metric(label="📝 Posts pro Tag", value="320")
-    st.plotly_chart(
-        create_pie_chart(mock_data.sentiment_count), use_container_width=True
-    )
+    with col2:
+        st.metric(label="🔥 Positive Posts", value=kpis["positive"])
+        st.plotly_chart(SubredditDashboard.create_line_chart(dashboard_data), use_container_width=True)
 
+    with col3:
+        st.metric(label="📝 Sentiment-Verteilung", value="Analyzed")
+        st.plotly_chart(SubredditDashboard.create_pie_chart(kpis), use_container_width=True)
