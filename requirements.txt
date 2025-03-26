@@ -1,7 +1,9 @@
 streamlit
 dotenv
 transformers
-tf-keras
+torch
+torchvision
+torchaudio
 praw
 plotly
 matplotlib
