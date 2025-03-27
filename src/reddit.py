@@ -69,7 +69,7 @@ def get_top_submission(
     :return: URL to the reddit submission
     """
     return (
-        "reddit.com"
+        "https://reddit.com"
         + next(
             connection.subreddit(subreddit).top(limit=1, time_filter="week")
         ).permalink
