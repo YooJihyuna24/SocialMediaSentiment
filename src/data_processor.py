@@ -19,27 +19,24 @@ class DataProcessor:
             os.getenv("CLIENT_ID"), os.getenv("CLIENT_SECRET")
         )
         self.sentiment_pipeline = create_sentiment_pipeline()
+        self.data = pd.DataFrame()
 
     def get_dashboard_data(self, subreddit: str) -> Dict:
-        sentiment_count = self.process_submission_to_sentiment(subreddit)
+        self.process_submission_to_sentiment(subreddit)
         return {
             "subscribers": get_subreddit_user_count(self.connection, subreddit),
             "top_submission_link": get_top_submission(self.connection, subreddit),
-            "sentiment_count": sentiment_count,
+            "sentiment_count": self.data["sentiment"].value_counts().to_dict(),
+            "submissions": self.data["submission"].to_list(),
         }
 
-    def process_submission_to_sentiment(self, subreddit: str) -> Dict[str, int]:
-        submissions = pd.DataFrame(
-            {"submission": get_submissions_text(self.connection, subreddit, "hot")}
+    def process_submission_to_sentiment(self, subreddit: str) -> None:
+        self.data = self.data.assign(
+            submission=get_submissions_text(self.connection, subreddit, "hot")
         )
 
-        submissions_with_sentiment = submissions.assign(
+        self.data = self.data.assign(
             sentiment=lambda df: df["submission"].apply(
                 lambda text: analyze_sentiment(self.sentiment_pipeline, text)
             )
         )
-        sentiment_count = (
-            submissions_with_sentiment["sentiment"].value_counts().to_dict()
-        )
-
-        return sentiment_count

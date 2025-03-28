@@ -1,6 +1,6 @@
-from typing import Dict
 from matplotlib.figure import Figure
 import streamlit as st
+from streamlit.components.v1 import iframe
 import matplotlib.pyplot as plt
 import plotly.express as px
 from wordcloud import WordCloud
@@ -8,35 +8,12 @@ import data_processor
 
 
 def create_wordcloud(text_data: str) -> Figure:
-    wordcloud = WordCloud(width=400, height=400, background_color="white").generate(
+    wordcloud = WordCloud(width=700, height=200, background_color="white").generate(
         text_data
     )
-    fig, ax = plt.subplots(figsize=(4, 4))
+    fig, ax = plt.subplots(figsize=(7, 2))
     ax.imshow(wordcloud, interpolation="bilinear")
     ax.axis("off")
-    return fig
-
-
-def create_line_chart(sentiment_over_time: Dict) -> Figure:
-    fig = px.line(
-        x=sentiment_over_time["dates"],
-        y=sentiment_over_time["sentiment"],
-        title="📈 Sentiment über Zeit",
-        labels={"x": "Datum", "y": "Sentiment"},
-        width=400,
-        height=400,
-    )
-    return fig
-
-
-def create_pie_chart(sentiment_count: Dict[str, int]) -> Figure:
-    fig = px.pie(
-        names=sentiment_count.keys(),
-        values=sentiment_count.values(),
-        title="🥧 Sentiment-Verteilung",
-        width=400,
-        height=400,
-    )
     return fig
 
 
@@ -53,20 +30,30 @@ subreddit_name = st.text_input("Subreddit", "wallstreetbets")
 with st.spinner("Fetching reddit submissions and classifying by sentiment..."):
     dashboard_data = processor.get_dashboard_data(subreddit_name)
 
-col1, col2, col3 = st.columns(3)
+col1, col2 = st.columns([1, 2])
+
 
 with col1:
-    st.metric(label="👥 Subreddit Subscribers", value=dashboard_data["subscribers"])
-##        st.pyplot(
-##           create_wordcloud(" ".join(dashboard_data["common_words"])),
-##          use_container_width=True,
-##     )
+    st.metric(label="👥 Subscribers", value=dashboard_data["subscribers"])
+    st.link_button(
+        url=dashboard_data["top_submission_link"],
+        label="Top reddit post",
+        icon="🔥",
+    )
 
+# iframe(src=dashboard_data["top_submission_link"])
 with col2:
-    st.plotly_chart(
-        create_pie_chart(dashboard_data["sentiment_count"]),
+    st.pyplot(
+        create_wordcloud(" ".join(dashboard_data["submissions"])),
         use_container_width=True,
     )
 
-with col3:
-    st.link_button(label="🔥 Top post", url=dashboard_data["top_submission_link"])
+
+st.plotly_chart(
+    px.pie(
+        names=dashboard_data["sentiment_count"].keys(),
+        values=dashboard_data["sentiment_count"].values(),
+        title="Sentiment of recent submissions",
+    ),
+    use_container_width=True,
+)
