@@ -1,50 +1,23 @@
-from typing import Dict
 from matplotlib.figure import Figure
 import streamlit as st
+from streamlit.components.v1 import iframe
 import matplotlib.pyplot as plt
 import plotly.express as px
 from wordcloud import WordCloud
-
-import mock_data
+import data_processor
 
 
 def create_wordcloud(text_data: str) -> Figure:
-    wordcloud = WordCloud(width=400, height=400, background_color="white").generate(
+    wordcloud = WordCloud(width=700, height=200, background_color="white").generate(
         text_data
     )
-    fig, ax = plt.subplots(figsize=(4, 4))
+    fig, ax = plt.subplots(figsize=(7, 2))
     ax.imshow(wordcloud, interpolation="bilinear")
     ax.axis("off")
-    st.markdown("<div style='margin-top: 25px;'></div>", unsafe_allow_html=True)
-    st.markdown(
-        '<h3 style="font-size:16px; font-family: Source Sans Pro;"><b>☁️ Wordcloud</b></h3>',
-        unsafe_allow_html=True,
-    )
-
     return fig
 
 
-def create_line_chart(sentiment_over_time: Dict):
-    fig = px.line(
-        x=sentiment_over_time["dates"],
-        y=sentiment_over_time["sentiment"],
-        title="📈 Sentiment über Zeit",
-        labels={"x": "Datum", "y": "Sentiment"},
-        width=400,
-        height=400,
-    )
-    return fig
-
-
-def create_pie_chart(sentiment_count: Dict):
-    fig = px.pie(
-        names=sentiment_count.keys(),
-        values=sentiment_count.values(),
-        title="🥧 Sentiment-Verteilung",
-        width=400,
-        height=400,
-    )
-    return fig
+processor = data_processor.DataProcessor()
 
 
 st.markdown(
@@ -52,25 +25,35 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-subreddit = st.text_input("Subreddit auswählen", mock_data.subreddit_name)
+subreddit_name = st.text_input("Subreddit", "wallstreetbets")
 
-st.markdown('<div class="kpi-container">', unsafe_allow_html=True)
+with st.spinner("Fetching reddit submissions and classifying by sentiment..."):
+    dashboard_data = processor.get_dashboard_data(subreddit_name)
 
-col1, col2, col3 = st.columns(3)
+col1, col2 = st.columns([1, 2])
+
 
 with col1:
-    st.metric(label="👥 Anzahl der Mitglieder", value="120K")
-    st.pyplot(create_wordcloud(mock_data.text_data))
+    st.metric(label="👥 Subscribers", value=dashboard_data["subscribers"])
+    st.link_button(
+        url=dashboard_data["top_submission_link"],
+        label="Top reddit post",
+        icon="🔥",
+    )
 
+# iframe(src=dashboard_data["top_submission_link"])
 with col2:
-    st.metric(label="🔥 Aktive Nutzer", value="5.2K")
-    st.plotly_chart(
-        create_line_chart(mock_data.sentiment_over_time), use_container_width=True
+    st.pyplot(
+        create_wordcloud(" ".join(dashboard_data["submissions"])),
+        use_container_width=True,
     )
 
-with col3:
-    st.metric(label="📝 Posts pro Tag", value="320")
-    st.plotly_chart(
-        create_pie_chart(mock_data.sentiment_count), use_container_width=True
-    )
 
+st.plotly_chart(
+    px.pie(
+        names=dashboard_data["sentiment_count"].keys(),
+        values=dashboard_data["sentiment_count"].values(),
+        title="Sentiment of recent submissions",
+    ),
+    use_container_width=True,
+)
