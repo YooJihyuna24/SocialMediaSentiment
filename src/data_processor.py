@@ -6,7 +6,7 @@ from reddit import (
     get_submissions_text,
     get_subreddit_user_count,
     get_top_submission,
-    initialize_reddit_api,
+    create_reddit_connection,
 )
 from sentiment_analyzer import analyze_sentiment, create_sentiment_pipeline
 import os
@@ -15,7 +15,7 @@ import os
 class DataProcessor:
     def __init__(self):
         load_dotenv()
-        self.connection = initialize_reddit_api(
+        self.connection = create_reddit_connection(
             os.getenv("CLIENT_ID"), os.getenv("CLIENT_SECRET")
         )
         self.sentiment_pipeline = create_sentiment_pipeline()
