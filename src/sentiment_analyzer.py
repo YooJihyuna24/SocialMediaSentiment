@@ -4,10 +4,12 @@ from transformers import (
     AutoTokenizer,
     TextClassificationPipeline,
 )
+import streamlit as st
 
 import settings
 
 
+@st.cache_resource
 def create_sentiment_pipeline(
     model_name: str = settings.TEXT_CLASSIFICATION_MODEL,
 ) -> TextClassificationPipeline:
@@ -45,14 +47,15 @@ def clean_up_text(text: str) -> str:
     return text
 
 
-def analyze_sentiment(pipeline: TextClassificationPipeline, text: str) -> str:
+@st.cache_data
+def analyze_sentiment(_pipeline: TextClassificationPipeline, text: str) -> str:
     """
     Analyzes sentiment of the given text using the pipeline
     :param text: Input string
     :return: Sentiment label
     """
     try:
-        result = list(pipeline(text))
+        result = list(_pipeline(text))
         return result[0]["label"]
     except Exception as e:
         return f"ERROR: {str(e)}"

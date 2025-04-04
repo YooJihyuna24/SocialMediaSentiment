@@ -27,8 +27,7 @@ st.markdown(
 
 subreddit_name = st.text_input("Subreddit", "wallstreetbets")
 
-with st.spinner("Fetching reddit submissions and classifying by sentiment..."):
-    dashboard_data = processor.get_dashboard_data(subreddit_name)
+dashboard_data = processor.get_dashboard_data(subreddit_name)
 
 col1, col2 = st.columns([1, 2])
 
