@@ -2,6 +2,7 @@ from typing import List, Literal
 from praw import Reddit
 
 import settings
+import re
 
 
 def initialize_reddit_api(client_id: str, client_secret: str) -> Reddit:
@@ -58,9 +59,9 @@ def get_subreddit_user_count(
     return connection.subreddit(subreddit).subscribers
 
 
-def get_top_submission(
+def get_top_submission_url(
     connection: Reddit,
-    subreddit: str,
+    subreddit: str
 ) -> str:
     """
     Fetches last week's top submission of the specified subreddit
@@ -74,3 +75,31 @@ def get_top_submission(
             connection.subreddit(subreddit).top(limit=1, time_filter="week")
         ).permalink
     )
+
+def get_top_submission_title(
+        connection: Reddit,
+        subreddit: str
+) -> str:
+    return (next(connection.subreddit(subreddit).top(limit=1, time_filter="week")).title)
+
+def get_reddit_embed_iframe(
+        post_url: str
+) -> str:
+    
+    match = re.search(r"(\/r\/[^\/]+\/comments\/[^\/]+)", post_url)
+    if not match:
+        raise ValueError("Invalid Reddit post URL")
+    
+    embed_path = match.group(1)
+    embed_url = f"https://www.redditmedia.com{embed_path}?ref_source=embed&ref=share&embed=true"
+
+    return f"""
+    <iframe
+    id="reddit-embed"
+    src="{embed_url}"
+    sandbox="allow-scripts allow-same-origin allow-popups"
+    style="border: none;"
+    column-fill="auto"
+    scrolling="yes">
+    </iframe>
+    """
