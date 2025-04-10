@@ -6,7 +6,6 @@ from transformers import (
 )
 import streamlit as st
 
-import settings
 
 
 @st.cache_resource

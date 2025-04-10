@@ -25,8 +25,8 @@ class DataProcessor:
             
         self.data = pd.DataFrame()
 
-    def get_dashboard_data(self, subreddit: str) -> Dict:
-        self.process_submission_to_sentiment(subreddit)
+    def get_dashboard_data(self, subreddit: str, submissions_count: int) -> Dict:
+        self.process_submission_to_sentiment(subreddit, submissions_count)
         return {
             "subscribers": get_subreddit_user_count(self.connection, subreddit),
             "top_submission_link": get_top_submission(self.connection, subreddit),
@@ -34,9 +34,9 @@ class DataProcessor:
             "submissions": self.data["submission"].to_list(),
         }
 
-    def process_submission_to_sentiment(self, subreddit: str) -> None:
+    def process_submission_to_sentiment(self, subreddit: str, submissions_count: int) -> None:
         self.data = self.data.assign(
-            submission=get_submissions_text(self.connection, subreddit, "hot")
+            submission=get_submissions_text(self.connection, subreddit, "hot", submissions_count)
         )
 
         self.data = self.data.assign(
