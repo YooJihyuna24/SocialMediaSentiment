@@ -3,6 +3,7 @@ from praw import Reddit
 import streamlit as st
 
 import settings
+import re
 
 
 @st.cache_resource
@@ -63,9 +64,9 @@ def get_subreddit_user_count(
 
 
 @st.cache_data
-def get_top_submission(
+def get_top_submission_url(
     _connection: Reddit,
-    subreddit: str,
+    subreddit: str
 ) -> str:
     """
     Fetches last week's top submission of the specified subreddit
@@ -79,3 +80,9 @@ def get_top_submission(
             _connection.subreddit(subreddit).top(limit=1, time_filter="week")
         ).permalink
     )
+
+def get_top_submission_title(
+        connection: Reddit,
+        subreddit: str
+) -> str:
+    return (next(connection.subreddit(subreddit).top(limit=1, time_filter="week")).title)

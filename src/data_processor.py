@@ -6,7 +6,7 @@ import pandas as pd
 from reddit import (
     get_submissions_text,
     get_subreddit_user_count,
-    get_top_submission,
+    get_top_submission_url,
     create_reddit_connection,
 )
 from sentiment_analyzer import analyze_sentiment, create_sentiment_pipeline
@@ -26,7 +26,7 @@ class DataProcessor:
         self.process_submission_to_sentiment(subreddit)
         return {
             "subscribers": get_subreddit_user_count(self.connection, subreddit),
-            "top_submission_link": get_top_submission(self.connection, subreddit),
+            "top_submission_link": get_top_submission_url(self.connection, subreddit),
             "sentiment_count": self.data["sentiment"].value_counts().to_dict(),
             "submissions": self.data["submission"].to_list(),
         }

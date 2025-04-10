@@ -1,7 +1,12 @@
 import streamlit as st
+import data_processor
 
-def page_posts_dashboard():
-    st.title("Posts Dashboard")
-    st.write("Hier werden individuelle Post-Analysen angezeigt.")
 
-page_posts_dashboard()
+st.markdown(
+    "<h1 style='text-align: center;'>📊 Posts Dashboard</h1>",
+    unsafe_allow_html=True,
+)
+
+submission_name = st.text_input("Submission", placeholder="Enter submission URL")
+
+processor = data_processor.DataProcessor()
