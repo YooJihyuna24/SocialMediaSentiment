@@ -1,12 +1,13 @@
 from typing import Dict
 from dotenv import load_dotenv
+from sentiment_analyzer import clean_up_text
 
 import pandas as pd
 from reddit import (
     get_submissions_text,
     get_subreddit_user_count,
     get_top_submission_url,
-    initialize_reddit_api,
+    create_reddit_connection,
 )
 from sentiment_analyzer import analyze_sentiment, create_sentiment_pipeline
 import os
@@ -15,7 +16,7 @@ import os
 class DataProcessor:
     def __init__(self):
         load_dotenv()
-        self.connection = initialize_reddit_api(
+        self.connection = create_reddit_connection(
             os.getenv("CLIENT_ID"), os.getenv("CLIENT_SECRET")
         )
         self.sentiment_pipeline = create_sentiment_pipeline()
@@ -34,7 +35,10 @@ class DataProcessor:
         self.data = self.data.assign(
             submission=get_submissions_text(self.connection, subreddit, "hot")
         )
-
+        self.data.submission = self.data.submission.apply(
+            lambda text: clean_up_text(text)
+        ) 
+        
         self.data = self.data.assign(
             sentiment=lambda df: df["submission"].apply(
                 lambda text: analyze_sentiment(self.sentiment_pipeline, text)

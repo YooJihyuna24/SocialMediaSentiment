@@ -1,11 +1,13 @@
 from typing import List, Literal
 from praw import Reddit
+import streamlit as st
 
 import settings
 import re
 
 
-def initialize_reddit_api(client_id: str, client_secret: str) -> Reddit:
+@st.cache_resource
+def create_reddit_connection(client_id: str, client_secret: str) -> Reddit:
     """
     Initializes the reddit api connection
     :param client_id: Client ID for authentication
@@ -20,8 +22,9 @@ def initialize_reddit_api(client_id: str, client_secret: str) -> Reddit:
     return connection
 
 
+@st.cache_data
 def get_submissions_text(
-    connection: Reddit,
+    _connection: Reddit,
     subreddit: str,
     submission_type: Literal["hot", "top", "new", "rising"],
     count: int = settings.SUBMISSION_COUNT,
@@ -36,18 +39,19 @@ def get_submissions_text(
     """
     match submission_type:
         case "hot":
-            submissions = connection.subreddit(subreddit).hot(limit=count)
+            submissions = _connection.subreddit(subreddit).hot(limit=count)
         case "new":
-            submissions = connection.subreddit(subreddit).new(limit=count)
+            submissions = _connection.subreddit(subreddit).new(limit=count)
         case "top":
-            submissions = connection.subreddit(subreddit).top(limit=count)
+            submissions = _connection.subreddit(subreddit).top(limit=count)
         case "rising":
-            submissions = connection.subreddit(subreddit).rising(limit=count)
+            submissions = _connection.subreddit(subreddit).rising(limit=count)
     return [submission.title + "\n" + submission.selftext for submission in submissions]
 
 
+@st.cache_data
 def get_subreddit_user_count(
-    connection: Reddit,
+    _connection: Reddit,
     subreddit: str,
 ) -> int:
     """
@@ -56,11 +60,12 @@ def get_subreddit_user_count(
     :param subreddit: Subreddit to get submissions from
     :return: Amount of subreddit subscribers
     """
-    return connection.subreddit(subreddit).subscribers
+    return _connection.subreddit(subreddit).subscribers
 
 
+@st.cache_data
 def get_top_submission_url(
-    connection: Reddit,
+    _connection: Reddit,
     subreddit: str
 ) -> str:
     """
@@ -72,7 +77,7 @@ def get_top_submission_url(
     return (
         "https://reddit.com"
         + next(
-            connection.subreddit(subreddit).top(limit=1, time_filter="week")
+            _connection.subreddit(subreddit).top(limit=1, time_filter="week")
         ).permalink
     )
 

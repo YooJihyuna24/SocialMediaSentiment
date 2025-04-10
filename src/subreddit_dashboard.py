@@ -10,25 +10,17 @@ import re
 
 
 def create_wordcloud(text_data: str) -> Figure:
-    stop_words = set(STOPWORDS).union(set(string.ascii_letters))
-    additional_stopwords = [
-        "html",
-        "https",
-        "com",
-        "www",
-        "reddit",
-        "r",
-        "reddit.com",
-        "reddit.com/r",
-    ]
-    stop_words.update(additional_stopwords)
+    STOPWORDS.update(string.ascii_letters)
 
     wordcloud = WordCloud(
-        width=500, height=300, background_color="white", stopwords=stop_words
-    ).generate(text_data)
-
-    fig, ax = plt.subplots(figsize=(3, 2))
-    ax.imshow(wordcloud, interpolation="auto")
+        width=700,
+        height=200,
+        background_color="white",
+        stopwords=STOPWORDS
+        ).generate(text_data)
+    
+    fig, ax = plt.subplots(figsize=(7, 2))
+    ax.imshow(wordcloud, interpolation="bilinear")
     ax.axis("off")
     return fig
 
@@ -55,8 +47,7 @@ st.markdown(
 
 subreddit_name = st.text_input("Subreddit", "wallstreetbets")
 
-with st.spinner("Fetching reddit submissions and classifying by sentiment..."):
-    dashboard_data = processor.get_dashboard_data(subreddit_name)
+dashboard_data = processor.get_dashboard_data(subreddit_name)
 
 col1, col2 = st.columns([1, 2])
 
