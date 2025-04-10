@@ -13,12 +13,16 @@ import os
 
 
 class DataProcessor:
-    def __init__(self):
+    def __init__(self, selected_model):
         load_dotenv()
         self.connection = create_reddit_connection(
             os.getenv("CLIENT_ID"), os.getenv("CLIENT_SECRET")
         )
-        self.sentiment_pipeline = create_sentiment_pipeline()
+        if selected_model=="Standard":
+            self.sentiment_pipeline = create_sentiment_pipeline(model_name="bhadresh-savani/distilbert-base-uncased-emotion")
+        elif selected_model=="Political":
+            self.sentiment_pipeline = create_sentiment_pipeline(model_name="m-newhauser/distilbert-political-tweets")
+            
         self.data = pd.DataFrame()
 
     def get_dashboard_data(self, subreddit: str) -> Dict:

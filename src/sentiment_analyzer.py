@@ -11,7 +11,7 @@ import settings
 
 @st.cache_resource
 def create_sentiment_pipeline(
-    model_name: str = settings.TEXT_CLASSIFICATION_MODEL,
+    model_name: str
 ) -> TextClassificationPipeline:
     """
     Retrieves a text classification model from hugging face and returns a pipeline
@@ -47,7 +47,7 @@ def clean_up_text(text: str) -> str:
     return text
 
 
-@st.cache_data
+#@st.cache_data
 def analyze_sentiment(_pipeline: TextClassificationPipeline, text: str) -> str:
     """
     Analyzes sentiment of the given text using the pipeline

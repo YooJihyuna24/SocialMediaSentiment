@@ -17,13 +17,16 @@ def create_wordcloud(text_data: str) -> Figure:
     return fig
 
 
-processor = data_processor.DataProcessor()
 
 
 st.markdown(
     "<h1 style='text-align: center;'>📊 Subreddit Dashboard</h1>",
     unsafe_allow_html=True,
 )
+with st.sidebar:
+    selected_model = st.pills("Modell", ["Standard", "Political"], selection_mode="single", default="Standard")
+
+processor = data_processor.DataProcessor(selected_model)
 
 subreddit_name = st.text_input("Subreddit", "wallstreetbets")
 
