@@ -79,3 +79,20 @@ def get_top_submission(
             _connection.subreddit(subreddit).top(limit=1, time_filter="week")
         ).permalink
     )
+
+@st.cache_data
+def get_comments_text (
+        _connection: Reddit,
+        submission_url: str,
+        limit: int = 30,
+) -> list:
+    """
+    Fetches a specified number of comments from a Reddit submission.
+    :param _connection: reddit api connection 
+    :param submission_url: URL of the Reddit post to fetch comments from
+    :param limit: Maximum number of comments to return (default: 30)
+    :return: List of comment texts (strings)
+    """
+    submission = _connection.submission(url=submission_url)
+    submission.comments.replace_more(limit=0)
+    return [comment.body for comment in submission.comments[:limit]]

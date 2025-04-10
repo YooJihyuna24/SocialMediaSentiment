@@ -7,6 +7,7 @@ from reddit import (
     get_subreddit_user_count,
     get_top_submission,
     create_reddit_connection,
+    get_comments_text,
 )
 from sentiment_analyzer import analyze_sentiment, create_sentiment_pipeline
 import os
@@ -40,3 +41,8 @@ class DataProcessor:
                 lambda text: analyze_sentiment(self.sentiment_pipeline, text)
             )
         )
+
+    def analyze_comments (self, submission_url: str, limit: int = 30 ) -> pd.DataFrame:
+        comments = get_comments_text(self.connection, submission_url, limit)
+        sentiments = [analyze_sentiment(self.sentiment_pipeline, text) for text in comments]
+        return pd.DataFrame({"comment": comments, "sentiment": sentiments})
