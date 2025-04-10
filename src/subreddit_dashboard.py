@@ -8,15 +8,13 @@ import data_processor
 import string
 
 def create_wordcloud(text_data: str) -> Figure:
-    stop_words =  set(STOPWORDS).union(set(string.ascii_letters))
-    additional_stopwords = ["html","https","com","www","reddit","r","reddit.com","reddit.com/r",]
-    stop_words.update(additional_stopwords)
+    STOPWORDS.update(string.ascii_letters)
 
     wordcloud = WordCloud(
         width=700,
         height=200,
         background_color="white",
-        stopwords=stop_words
+        stopwords=STOPWORDS
         ).generate(text_data)
     
     fig, ax = plt.subplots(figsize=(7, 2))
