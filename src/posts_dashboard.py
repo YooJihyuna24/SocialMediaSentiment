@@ -30,10 +30,9 @@ def show_sentiment_dashboard(df):
     ax.axis("off")
     st.pyplot(fig)
 
-    st.subheader("📝 Einzelne Kommentare")
-    for _, row in df.iterrows():
-        st.markdown(f"**{row['sentiment']}**: {row['comment']}")
-
+   
+    
+    st.dataframe(df)
 
 def page_posts_dashboard():
     st.title("Posts Dashboard")
@@ -48,6 +47,8 @@ def page_posts_dashboard():
         with st.spinner("Kommentare werden analysiert..."):
             df = processor.analyze_comments(url, limit=limit)
             show_sentiment_dashboard(df)
+    
+    
 
 
 page_posts_dashboard()
