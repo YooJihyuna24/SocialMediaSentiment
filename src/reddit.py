@@ -81,25 +81,3 @@ def get_top_submission_title(
         subreddit: str
 ) -> str:
     return (next(connection.subreddit(subreddit).top(limit=1, time_filter="week")).title)
-
-def get_reddit_embed_iframe(
-        post_url: str
-) -> str:
-    
-    match = re.search(r"(\/r\/[^\/]+\/comments\/[^\/]+)", post_url)
-    if not match:
-        raise ValueError("Invalid Reddit post URL")
-    
-    embed_path = match.group(1)
-    embed_url = f"https://www.redditmedia.com{embed_path}?ref_source=embed&ref=share&embed=true"
-
-    return f"""
-    <iframe
-    id="reddit-embed"
-    src="{embed_url}"
-    sandbox="allow-scripts allow-same-origin allow-popups"
-    style="border: none;"
-    column-fill="auto"
-    scrolling="yes">
-    </iframe>
-    """
