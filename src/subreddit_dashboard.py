@@ -1,16 +1,22 @@
 from matplotlib.figure import Figure
 import streamlit as st
-from streamlit.components.v1 import iframe
+import streamlit.components.v1 as components
 import matplotlib.pyplot as plt
 import plotly.express as px
-from wordcloud import WordCloud
+from wordcloud import WordCloud, STOPWORDS
 import data_processor
-
+import string
 
 def create_wordcloud(text_data: str) -> Figure:
-    wordcloud = WordCloud(width=700, height=200, background_color="white").generate(
-        text_data
-    )
+    STOPWORDS.update(string.ascii_letters)
+
+    wordcloud = WordCloud(
+        width=700,
+        height=200,
+        background_color="white",
+        stopwords=STOPWORDS
+        ).generate(text_data)
+    
     fig, ax = plt.subplots(figsize=(7, 2))
     ax.imshow(wordcloud, interpolation="bilinear")
     ax.axis("off")
@@ -39,8 +45,7 @@ with col1:
         label="Top reddit post",
         icon="🔥",
     )
-
-# iframe(src=dashboard_data["top_submission_link"])
+    
 with col2:
     st.pyplot(
         create_wordcloud(" ".join(dashboard_data["submissions"])),
