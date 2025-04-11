@@ -5,7 +5,7 @@ from visual_helpers import create_wordcloud
 
 st.title("Posts Dashboard")
 
-processor = DataProcessor()
+processor = DataProcessor("Standard")
 
 url = st.text_input("Reddit-Post-URL eingeben:", "")
 limit = st.slider("Wie viele Kommentare sollen analysiert werden?", 10, 100, 30)

@@ -21,16 +21,25 @@ def get_reddit_embed_iframe(post_url: str) -> str:
     return components.iframe(embed_url, width=500, height=300, scrolling=True)
 
 
-processor = DataProcessor()
-
 st.markdown(
     "<h1 style='text-align: center;'>📊 Subreddit Dashboard</h1>",
     unsafe_allow_html=True,
 )
 
+with st.sidebar:
+    selected_model = st.pills(
+        "Model", ["Standard", "Political"], selection_mode="single", default="Standard"
+    )
+    submissions_count = st.select_slider(
+        "Number of submissions", options=range(1, 101), value=10
+    )
+
+processor = DataProcessor(selected_model)
 subreddit_name = st.text_input("Subreddit", "wallstreetbets")
 
-dashboard_data = processor.get_subreddit_dashboard_data(subreddit_name)
+dashboard_data = processor.get_subreddit_dashboard_data(
+    subreddit_name, submissions_count
+)
 
 col1, col2 = st.columns([1, 2])
 

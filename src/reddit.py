@@ -2,9 +2,6 @@ from typing import List, Literal
 from praw import Reddit
 import streamlit as st
 
-import settings
-import re
-
 
 @st.cache_resource
 def create_reddit_connection(client_id: str, client_secret: str) -> Reddit:
@@ -27,7 +24,7 @@ def get_submissions_text(
     _connection: Reddit,
     subreddit: str,
     submission_type: Literal["hot", "top", "new", "rising"],
-    count: int = settings.SUBMISSION_COUNT,
+    submissions_count: int,
 ) -> List[str]:
     """
     Fetches submissions from specified subreddit with title and text concatenated
@@ -39,13 +36,15 @@ def get_submissions_text(
     """
     match submission_type:
         case "hot":
-            submissions = _connection.subreddit(subreddit).hot(limit=count)
+            submissions = _connection.subreddit(subreddit).hot(limit=submissions_count)
         case "new":
-            submissions = _connection.subreddit(subreddit).new(limit=count)
+            submissions = _connection.subreddit(subreddit).new(limit=submissions_count)
         case "top":
-            submissions = _connection.subreddit(subreddit).top(limit=count)
+            submissions = _connection.subreddit(subreddit).top(limit=submissions_count)
         case "rising":
-            submissions = _connection.subreddit(subreddit).rising(limit=count)
+            submissions = _connection.subreddit(subreddit).rising(
+                limit=submissions_count
+            )
     return [submission.title + "\n" + submission.selftext for submission in submissions]
 
 
