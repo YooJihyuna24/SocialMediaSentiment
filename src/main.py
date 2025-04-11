@@ -4,8 +4,8 @@ st.set_page_config(initial_sidebar_state="collapsed")
 
 pg = st.navigation(
     [
-        st.Page("subreddit_dashboard.py", title="Subreddit Dashboard"),
-        st.Page("posts_dashboard.py", title="Posts Dashboard"),
+        st.Page("pages/subreddit_dashboard.py", title="Subreddit Dashboard"),
+        st.Page("pages/posts_dashboard.py", title="Posts Dashboard"),
     ]
 )
 pg.run()

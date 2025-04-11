@@ -1,23 +1,10 @@
-from matplotlib.figure import Figure
 import streamlit as st
-from streamlit.components.v1 import iframe
-import matplotlib.pyplot as plt
 import plotly.express as px
-from wordcloud import WordCloud
-import data_processor
+from data_processor import DataProcessor
+from visual_helpers import create_wordcloud
 
 
-def create_wordcloud(text_data: str) -> Figure:
-    wordcloud = WordCloud(width=700, height=200, background_color="white").generate(
-        text_data
-    )
-    fig, ax = plt.subplots(figsize=(7, 2))
-    ax.imshow(wordcloud, interpolation="bilinear")
-    ax.axis("off")
-    return fig
-
-
-processor = data_processor.DataProcessor()
+processor = DataProcessor()
 
 
 st.markdown(
@@ -27,7 +14,7 @@ st.markdown(
 
 subreddit_name = st.text_input("Subreddit", "wallstreetbets")
 
-dashboard_data = processor.get_dashboard_data(subreddit_name)
+dashboard_data = processor.get_subreddit_dashboard_data(subreddit_name)
 
 col1, col2 = st.columns([1, 2])
 
@@ -40,11 +27,9 @@ with col1:
         icon="🔥",
     )
 
-# iframe(src=dashboard_data["top_submission_link"])
 with col2:
     st.pyplot(
-        create_wordcloud(" ".join(dashboard_data["submissions"])),
-        use_container_width=True,
+        create_wordcloud(dashboard_data["submissions"]),
     )
 
 
