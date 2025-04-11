@@ -8,6 +8,7 @@ from reddit import (
     get_subreddit_user_count,
     get_top_submission_url,
     create_reddit_connection,
+    get_comments_text,
 )
 from sentiment_analyzer import analyze_sentiment, create_sentiment_pipeline
 import os
@@ -22,7 +23,7 @@ class DataProcessor:
         self.sentiment_pipeline = create_sentiment_pipeline()
         self.data = pd.DataFrame()
 
-    def get_dashboard_data(self, subreddit: str) -> Dict:
+    def get_subreddit_dashboard_data(self, subreddit: str) -> Dict:
         self.process_submission_to_sentiment(subreddit)
         return {
             "subscribers": get_subreddit_user_count(self.connection, subreddit),
@@ -44,3 +45,12 @@ class DataProcessor:
                 lambda text: analyze_sentiment(self.sentiment_pipeline, text)
             )
         )
+
+    def get_posts_dashboard_data(
+        self, submission_url: str, limit: int = 30
+    ) -> pd.DataFrame:
+        comments = get_comments_text(self.connection, submission_url, limit)
+        sentiments = [
+            analyze_sentiment(self.sentiment_pipeline, text) for text in comments
+        ]
+        return pd.DataFrame({"comment": comments, "sentiment": sentiments})
