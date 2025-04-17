@@ -7,11 +7,8 @@ from transformers import (
 import streamlit as st
 
 
-
 @st.cache_resource
-def create_sentiment_pipeline(
-    model_name: str
-) -> TextClassificationPipeline:
+def create_sentiment_pipeline(model_name: str) -> TextClassificationPipeline:
     """
     Retrieves a text classification model from hugging face and returns a pipeline
     :param model_name: Text classification model string name
@@ -46,15 +43,19 @@ def clean_up_text(text: str) -> str:
     return text
 
 
-#@st.cache_data
-def analyze_sentiment(_pipeline: TextClassificationPipeline, text: str) -> str:
+@st.cache_data(
+    hash_funcs={
+        TextClassificationPipeline: lambda pipeline: pipeline.model.config._name_or_path
+    }
+)
+def analyze_sentiment(pipeline: TextClassificationPipeline, text: str) -> str:
     """
     Analyzes sentiment of the given text using the pipeline
     :param text: Input string
     :return: Sentiment label
     """
     try:
-        result = list(_pipeline(text))
+        result = list(pipeline(text))
         return result[0]["label"]
     except Exception as e:
         return f"ERROR: {str(e)}"
