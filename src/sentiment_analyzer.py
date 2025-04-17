@@ -55,7 +55,10 @@ def analyze_sentiment(pipeline: TextClassificationPipeline, text: str) -> str:
     :return: Sentiment label
     """
     try:
-        result = list(pipeline(text))
-        return result[0]["label"]
-    except Exception as e:
-        return f"ERROR: {str(e)}"
+        result = pipeline(text)
+        if result and isinstance(result, list) and len(result) > 0:
+            return result[0]["label"]
+        else:
+            return "Unknown"
+    except Exception:
+        raise RuntimeError("An error occurred while analyzing sentiment.")

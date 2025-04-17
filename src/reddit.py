@@ -1,5 +1,7 @@
 from typing import List, Literal
 from praw import Reddit
+from prawcore.exceptions import NotFound
+from praw.exceptions import InvalidURL
 import streamlit as st
 
 
@@ -19,6 +21,21 @@ def create_reddit_connection(client_id: str, client_secret: str) -> Reddit:
     return connection
 
 
+def handle_subreddit_not_found(func):
+    """
+    Decorator to handle NotFound error from praw and raise a custom error
+    """
+
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except NotFound:
+            raise ValueError("The subreddit was not found.")
+
+    return wrapper
+
+
+@handle_subreddit_not_found
 @st.cache_data
 def get_submissions_text(
     _connection: Reddit,
@@ -45,9 +62,11 @@ def get_submissions_text(
             submissions = _connection.subreddit(subreddit).rising(
                 limit=submissions_count
             )
+
     return [submission.title + "\n" + submission.selftext for submission in submissions]
 
 
+@handle_subreddit_not_found
 @st.cache_data
 def get_subreddit_user_count(
     _connection: Reddit,
@@ -62,6 +81,7 @@ def get_subreddit_user_count(
     return _connection.subreddit(subreddit).subscribers
 
 
+@handle_subreddit_not_found
 @st.cache_data
 def get_top_submission_url(_connection: Reddit, subreddit: str) -> str:
     """
@@ -82,8 +102,8 @@ def get_top_submission_url(_connection: Reddit, subreddit: str) -> str:
 def get_comments_text(
     _connection: Reddit,
     submission_url: str,
-    limit: int = 30,
-) -> list:
+    submission_count: int,
+) -> List[str]:
     """
     Fetches a specified number of comments from a Reddit submission.
     :param _connection: reddit api connection
@@ -91,6 +111,11 @@ def get_comments_text(
     :param limit: Maximum number of comments to return (default: 30)
     :return: List of comment texts (strings)
     """
-    submission = _connection.submission(url=submission_url)
+    try:
+        submission = _connection.submission(url=submission_url)
+    except InvalidURL:
+        raise ValueError("The submission URL is not valid.")
+    except NotFound:
+        raise ValueError("The submission was not found.")
     submission.comments.replace_more(limit=0)
-    return [comment.body for comment in submission.comments[:limit]]
+    return [comment.body for comment in submission.comments[:submission_count]]

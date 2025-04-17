@@ -11,15 +11,17 @@ url = st.text_input("Submission URL", "")
 
 if url:
     with st.spinner():
-        data = get_posts_dashboard_data(url)
-
-        st.plotly_chart(
-            px.pie(
-                names=data["sentiment_count"].keys(),
-                values=data["sentiment_count"].values(),
-                title="Sentiment",
-            ),
-            use_container_width=True,
-        )
-
-        st.pyplot(create_wordcloud(data["comments"]))
+        try:
+            data = get_posts_dashboard_data(url)
+        except Exception as e:
+            st.error(f"Error fetching posts data: {str(e)} Try checking your input.")
+        else:
+            st.plotly_chart(
+                px.pie(
+                    names=data["sentiment_count"].keys(),
+                    values=data["sentiment_count"].values(),
+                    title="Sentiment",
+                ),
+                use_container_width=True,
+            )
+            st.pyplot(create_wordcloud(data["comments"]))
