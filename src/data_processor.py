@@ -10,6 +10,7 @@ from reddit import (
     get_top_submission_url,
     create_reddit_connection,
     get_comments_text,
+    get_submission_score,
 )
 from sentiment_analyzer import analyze_sentiment, create_sentiment_pipeline
 import os
@@ -27,7 +28,7 @@ def initialize_reddit_connection() -> None:
     client_secret = os.getenv("CLIENT_SECRET")
     if client_id is None or client_secret is None:
         raise EnvironmentError(
-            "CLIENT_ID and CLIENT_SECRET are required for the connection to reddit but either one or both are not set."
+            "CLIENT_ID and CLIENT_SECRET are required for the connection to reddit. At least one is not set currently."
         )
     st.session_state.connection = create_reddit_connection(client_id, client_secret)
 
@@ -57,7 +58,11 @@ def get_posts_dashboard_data(submission_url: str) -> Dict:
     ]
     sentiment_count = Counter(sentiments)
 
-    return {"comments": comments, "sentiment_count": sentiment_count}
+    return {
+        "score": get_submission_score(st.session_state.connection, submission_url),
+        "comments": comments,
+        "sentiment_count": sentiment_count,
+    }
 
 
 def process_submissions(subreddit: str) -> Tuple[List[str], Dict[str, int]]:

@@ -35,6 +35,22 @@ def handle_subreddit_not_found(func):
     return wrapper
 
 
+def handle_submission_not_found(func):
+    """
+    Decorator to handle InvalidURL and NotFound errors for submission-related functions
+    """
+
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except InvalidURL:
+            raise ValueError("The submission URL is not valid.")
+        except NotFound:
+            raise ValueError("The submission was not found.")
+
+    return wrapper
+
+
 @handle_subreddit_not_found
 @st.cache_data
 def get_submissions_text(
@@ -98,6 +114,7 @@ def get_top_submission_url(_connection: Reddit, subreddit: str) -> str:
     )
 
 
+@handle_submission_not_found
 @st.cache_data
 def get_comments_text(
     _connection: Reddit,
@@ -111,11 +128,16 @@ def get_comments_text(
     :param limit: Maximum number of comments to return (default: 30)
     :return: List of comment texts (strings)
     """
-    try:
-        submission = _connection.submission(url=submission_url)
-    except InvalidURL:
-        raise ValueError("The submission URL is not valid.")
-    except NotFound:
-        raise ValueError("The submission was not found.")
+    submission = _connection.submission(url=submission_url)
     submission.comments.replace_more(limit=0)
     return [comment.body for comment in submission.comments[:submission_count]]
+
+
+@handle_submission_not_found
+@st.cache_data
+def get_submission_score(
+    _connection: Reddit,
+    submission_url: str,
+) -> int:
+    submission = _connection.submission(url=submission_url)
+    return submission.score
