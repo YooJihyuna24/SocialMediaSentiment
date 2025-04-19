@@ -1,20 +1,24 @@
-import streamlit as st
-from typing import Dict, List, Tuple
-from dotenv import load_dotenv
-from sentiment_analyzer import clean_up_text
+import os
 from collections import Counter
+from typing import Dict, List, Tuple
 
+import streamlit as st
+from dotenv import load_dotenv
+
+from models import models
 from reddit import (
-    get_submissions_text,
-    get_subreddit_subscriber_count,
-    get_top_submission_url,
     create_reddit_connection,
     get_comments_text,
     get_submission_score,
+    get_submissions_text,
+    get_subreddit_subscriber_count,
+    get_top_submission_url,
 )
-from sentiment_analyzer import analyze_sentiment, create_sentiment_pipeline
-import os
-from models import models
+from sentiment_analyzer import (
+    analyze_sentiment,
+    clean_up_text,
+    create_sentiment_pipeline,
+)
 
 
 def initialize_sentiment_pipelines() -> None:

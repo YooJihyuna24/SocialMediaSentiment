@@ -1,10 +1,11 @@
 import re
+
+import streamlit as st
 from transformers import (
     AutoModelForSequenceClassification,
     AutoTokenizer,
     TextClassificationPipeline,
 )
-import streamlit as st
 
 
 @st.cache_resource

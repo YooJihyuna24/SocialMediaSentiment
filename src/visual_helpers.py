@@ -1,9 +1,10 @@
+import re
+import string
+from typing import List
+
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
-from wordcloud import WordCloud, STOPWORDS
-from typing import List
-import string
-import re
+from wordcloud import STOPWORDS, WordCloud
 
 
 def create_wordcloud(text_list: List[str]) -> Figure:

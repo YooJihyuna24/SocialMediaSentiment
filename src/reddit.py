@@ -1,8 +1,9 @@
 from typing import List, Literal
-from praw import Reddit
-from prawcore.exceptions import NotFound
-from praw.exceptions import InvalidURL
+
 import streamlit as st
+from praw import Reddit
+from praw.exceptions import InvalidURL
+from prawcore.exceptions import NotFound
 
 
 @st.cache_resource

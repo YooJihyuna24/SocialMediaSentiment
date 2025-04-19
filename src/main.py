@@ -1,7 +1,7 @@
 import streamlit as st
 
-from models import models
 from data_processor import initialize_reddit_connection, initialize_sentiment_pipelines
+from models import models
 
 st.logo("Logo1.png")
 

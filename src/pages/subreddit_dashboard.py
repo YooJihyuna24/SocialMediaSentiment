@@ -1,11 +1,9 @@
-import streamlit as st
 import plotly.express as px
+import streamlit as st
+import streamlit.components.v1 as components
 
 from data_processor import get_subreddit_dashboard_data
 from visual_helpers import create_wordcloud, get_reddit_embed_url
-import streamlit.components.v1 as components
-import plotly.express as px
-
 
 st.title("Subreddit Dashboard")
 
