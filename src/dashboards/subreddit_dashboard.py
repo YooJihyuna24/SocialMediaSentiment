@@ -8,7 +8,7 @@ from visual_helpers import create_wordcloud, get_reddit_embed_url
 st.title("Subreddit Dashboard")
 
 
-subreddit_name = st.text_input("Subreddit", "wallstreetbets")
+subreddit_name = st.text_input("Subreddit", "")
 
 if subreddit_name:
     with st.spinner("Fetching subreddit data and classifying submissions..."):
