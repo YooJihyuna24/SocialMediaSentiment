@@ -7,6 +7,16 @@ import re
 
 
 def create_wordcloud(text_list: List[str]) -> Figure:
+    """
+    Create and return a word cloud figure based on a list of text strings.
+
+    Parameters:
+        text_list (List[str]): A list of strings to generate the word cloud from.
+
+    Returns:
+        Figure: A matplotlib Figure containing the generated word cloud.
+    """
+
     STOPWORDS.update(string.ascii_letters)
     text = "".join(text_list)
     wordcloud = WordCloud(
@@ -19,6 +29,16 @@ def create_wordcloud(text_list: List[str]) -> Figure:
 
 
 def get_reddit_embed_url(post_url: str) -> str:
+    """
+    Generate an embeddable URL for a given Reddit post URL.
+    Parameters:
+        post_url (str): The original Reddit post URL.
+    Returns:
+        str: An embeddable URL formatted to be used for embedding the Reddit post.
+    Raises:
+        ValueError: If the post_url does not match the expected Reddit post pattern.
+    """
+
     match = re.search(r"(\/r\/[^\/]+\/comments\/[^\/]+)", post_url)
     if not match:
         raise ValueError("Invalid Reddit post URL")
