@@ -1,4 +1,8 @@
 import streamlit as st
+import torch
+
+# This is the best workaround I found to silence a RuntimeError warning from streamlit
+torch.classes.__path__ = []
 
 from data_processor import initialize_reddit_connection, initialize_sentiment_pipelines
 from models import models
