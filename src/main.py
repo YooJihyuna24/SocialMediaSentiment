@@ -1,12 +1,13 @@
 import streamlit as st
 
-from models import models
 from data_processor import initialize_reddit_connection, initialize_sentiment_pipelines
+from models import models
 
 st.logo("Logo1.png")
 
-initialize_sentiment_pipelines()
-initialize_reddit_connection()
+with st.spinner("Initializing reddit connection and sentiment pipelines..."):
+    initialize_sentiment_pipelines()
+    initialize_reddit_connection()
 
 with st.sidebar:
     st.session_state.selected_model = st.pills(

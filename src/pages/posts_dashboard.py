@@ -1,6 +1,6 @@
+import plotly.express as px
 import streamlit as st
 import streamlit.components.v1 as components
-import plotly.express as px
 
 from data_processor import get_posts_dashboard_data
 from visual_helpers import create_wordcloud, get_reddit_embed_url
@@ -11,7 +11,7 @@ st.title("Posts Dashboard")
 url = st.text_input("Submission URL", "")
 
 if url:
-    with st.spinner():
+    with st.spinner("Fetching posts data and classifying comments..."):
         try:
             data = get_posts_dashboard_data(url)
         except Exception as e:
