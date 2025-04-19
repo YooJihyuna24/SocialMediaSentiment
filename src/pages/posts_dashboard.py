@@ -1,34 +1,37 @@
 import streamlit as st
-from data_processor import DataProcessor
+import streamlit.components.v1 as components
 import plotly.express as px
-from visual_helpers import create_wordcloud
+
+from data_processor import get_posts_dashboard_data
+from visual_helpers import create_wordcloud, get_reddit_embed_url
 
 st.title("Posts Dashboard")
 
-processor = DataProcessor("Standard")
 
-url = st.text_input("Reddit-Post-URL eingeben:", "")
-limit = st.slider("Wie viele Kommentare sollen analysiert werden?", 10, 100, 30)
+url = st.text_input("Submission URL", "")
 
 if url:
-    df = processor.get_posts_dashboard_data(url, limit=limit)
-    st.subheader("📊 Sentiment-Verteilung der Kommentare")
+    with st.spinner():
+        try:
+            data = get_posts_dashboard_data(url)
+        except Exception as e:
+            st.error(f"Error fetching posts data: {str(e)} Try checking your input.")
+        else:
+            col1, col2 = st.columns([1, 2])
+            with col1:
+                st.metric(label="⬆️ Score", value=data["score"])
 
-    sentiment_counts = df["sentiment"].value_counts().reset_index()
-    sentiment_counts.columns = ["sentiment", "count"]
+                embed_url = get_reddit_embed_url(url)
+                components.iframe(embed_url, width=500, height=300, scrolling=True)
 
-    st.plotly_chart(
-        px.pie(
-            sentiment_counts,
-            names="sentiment",
-            values="count",
-            title="Sentiment-Auswertung der Kommentare",
-        ),
-        use_container_width=True,
-    )
+            with col2:
+                st.plotly_chart(
+                    px.pie(
+                        names=data["sentiment_count"].keys(),
+                        values=data["sentiment_count"].values(),
+                        title="Sentiment",
+                    ),
+                    use_container_width=True,
+                )
 
-    st.subheader("WordCloud der Kommentare")
-
-    st.pyplot(create_wordcloud(df["comment"]))
-
-    st.dataframe(df)
+            st.pyplot(create_wordcloud(data["comments"]))
