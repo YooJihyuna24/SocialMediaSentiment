@@ -5,8 +5,9 @@ from models import models
 
 st.logo("Logo1.png")
 
-initialize_sentiment_pipelines()
-initialize_reddit_connection()
+with st.spinner("Initializing reddit connection and sentiment pipelines..."):
+    initialize_sentiment_pipelines()
+    initialize_reddit_connection()
 
 with st.sidebar:
     st.session_state.selected_model = st.pills(

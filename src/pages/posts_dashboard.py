@@ -11,7 +11,7 @@ st.title("Posts Dashboard")
 url = st.text_input("Submission URL", "")
 
 if url:
-    with st.spinner():
+    with st.spinner("Fetching posts data and classifying comments..."):
         try:
             data = get_posts_dashboard_data(url)
         except Exception as e:

@@ -11,7 +11,7 @@ st.title("Subreddit Dashboard")
 subreddit_name = st.text_input("Subreddit", "wallstreetbets")
 
 if subreddit_name:
-    with st.spinner():
+    with st.spinner("Fetching subreddit data and classifying submissions..."):
         try:
             data = get_subreddit_dashboard_data(subreddit_name)
         except Exception as e:
