@@ -1,4 +1,8 @@
 import streamlit as st
+import torch
+
+# This is the best workaround I found to silence a RuntimeError warning from streamlit
+torch.classes.__path__ = []
 
 from data_processor import initialize_reddit_connection, initialize_sentiment_pipelines
 from models import models
@@ -32,8 +36,8 @@ with st.sidebar:
 
 pg = st.navigation(
     [
-        st.Page("pages/subreddit_dashboard.py", title="Subreddit Dashboard"),
-        st.Page("pages/posts_dashboard.py", title="Posts Dashboard"),
+        st.Page("dashboards/subreddit_dashboard.py", title="Subreddit Dashboard"),
+        st.Page("dashboards/posts_dashboard.py", title="Posts Dashboard"),
     ]
 )
 pg.run()
