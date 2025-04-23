@@ -18,7 +18,7 @@ with st.sidebar:
         "model",
         models.keys(),
         selection_mode="single",
-        default="standard",
+        default="distilbert",
     )
 
     st.session_state.filter_mode = st.pills(
